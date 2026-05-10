@@ -1,11 +1,14 @@
 import os
 import tensorflow as tf
+from .logger import ExperimentLogger
 from . import config
 from .data_loader import load_datasets
 from .model import CrackDetectionModel
 
 def train():
-    
+    # Integrate wandb experiment logger if enabled (initiate)
+    ExperimentLogger.init()
+
     # Prepare data
     print("Loading datasets...")
     train_ds, val_ds, _, class_names = load_datasets()
@@ -58,7 +61,9 @@ def train():
             patience=5,
             min_lr=1e-7,
             verbose=1
-        )
+        ),
+        # Integrate wandb experiment logger if enabled (callbacks)
+        *ExperimentLogger.get_train_callbacks()
     ]
 
     # Run training
@@ -69,6 +74,9 @@ def train():
         epochs=config.EPOCHS,
         callbacks=callbacks
     )
+
+    # Integrate wandb experiment logger if enabled (upload model)
+    ExperimentLogger.upload_model(model_path)
 
     return history
 

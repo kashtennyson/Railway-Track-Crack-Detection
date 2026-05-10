@@ -2,6 +2,7 @@ import os
 import argparse
 from src.train import train
 from src.evaluate import evaluate
+from src.logger import ExperimentLogger
 
 # Supress info and warning logs
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -18,15 +19,18 @@ def main():
 
     args = parser.parse_args()
 
-    if args.action == "train":
-        train()
-    elif args.action == "evaluate":
-        evaluate()
-    elif args.action == "all":
-        print("--- Starting Full Pipeline ---")
-        train()
-        print("\n--- Training Complete. Starting Evaluation ---")
-        evaluate()
+    try:
+        if args.action == "train":
+            train()
+        elif args.action == "evaluate":
+            evaluate()
+        elif args.action == "all":
+            print("--- Starting Full Pipeline ---")
+            train()
+            print("\n--- Training Complete. Starting Evaluation ---")
+            evaluate()
+    finally:
+        ExperimentLogger.finish()
 
 if __name__ == "__main__":
     main()

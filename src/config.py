@@ -13,3 +13,8 @@ LEARNING_RATE = 0.0001
 TRAIN_RATIO = 0.8
 VAL_RATIO = 0.1
 TEST_RATIO = 0.1
+
+# W&B settings
+WANDB_PROJECT = "Railway-Track-Crack-Detection"
+WANDB_ENTITY = 'kashtennyson'
+USE_WANDB = True

@@ -4,6 +4,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix, classification_report
+from .logger import ExperimentLogger
 from . import config
 from .data_loader import load_datasets
 
@@ -30,6 +31,9 @@ def evaluate():
         y_true.extend(labels.numpy())
         y_pred.extend(np.argmax(preds, axis=1))
 
+    # Integrate wandb experiment logger if enabled (evaluate)
+    ExperimentLogger.log_evaluation(y_true, y_pred, class_names)
+
     # Generate classification report
     print("\nClassification Report:")
     print(classification_report(y_true, y_pred, target_names=class_names))
@@ -47,7 +51,6 @@ def evaluate():
     plot_path = os.path.join(config.OUTPUT_DIR, "confusion_matrix.png")
     plt.savefig(plot_path)
     print(f"\nConfusion matrix saved to {plot_path}")
-    plt.show()
 
 if __name__ == "__main__":
     evaluate()
