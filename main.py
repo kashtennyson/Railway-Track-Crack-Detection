@@ -1,5 +1,7 @@
 import os
+import sys
 import argparse
+from src import config
 from src.train import train
 from src.evaluate import evaluate
 from src.logger import ExperimentLogger
@@ -8,16 +10,52 @@ from src.logger import ExperimentLogger
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 def main():
-    parser = argparse.ArgumentParser(description="Railway Track Crack Detection")
+    """
+    Main entry point for the Railway Track Crack Detection System.
+    Handles CLI arguments and applies hyperparameter overrides to the central config.
+    """
+
+    parser = argparse.ArgumentParser(
+        description="Railway Track Crack Detection",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        )
     
-    # Add arguments
+    # Primary action
     parser.add_argument(
         "action", 
         choices=["train", "evaluate", "all"],
-        help="Action to perform: train the model, evaluate it, or do both."
+        help="Action to perform: 'train' from scratch, 'evaluate' the best saved model, or 'all' (both)."
     )
 
+    # Hyperparameter overrides
+    parser.add_argument(
+        "--epochs", type=int, help="Override number of training epochs"
+        )
+    parser.add_argument(
+        "--lr", type=float, help="Override learning rate"
+        )
+    parser.add_argument(
+        "--batch_size", type=int, help="Override batch size"
+        )    
+
     args = parser.parse_args()
+
+    # Apply overrides
+    if args.epochs:
+        config.EPOCHS = args.epochs
+    if args.lr:
+        config.LEARNING_RATE = args.lr
+    if args.batch_size:
+        config.BATCH_SIZE = args.batch_size
+
+    # Print a summary
+    print(f"\n--- Pipeline Configuration ---")
+    print(f"Action:      {args.action.upper()}")
+    print(f"Epochs:      {config.EPOCHS}")
+    print(f"LR:          {config.LEARNING_RATE}")
+    print(f"Batch Size:  {config.BATCH_SIZE}")
+    print(f"W&B Logging: {'Enabled' if config.USE_WANDB else 'Disabled'}")
+    print(f"------------------------------\n")        
 
     try:
         if args.action == "train":
@@ -25,10 +63,22 @@ def main():
         elif args.action == "evaluate":
             evaluate()
         elif args.action == "all":
-            print("--- Starting Full Pipeline ---")
+            print("\n--- Starting Full Pipeline ---")
             train()
             print("\n--- Training Complete. Starting Evaluation ---")
             evaluate()
+        
+        print("\n--- Pipeline execution finished ---")
+        sys.exit(0)
+
+    except KeyboardInterrupt:
+        print("\n--- Pipeline stopped by user ---")
+        sys.exit(0)
+    
+    except Exception as e:
+        print(f"\n--- Pipeline failed with the following message: {e}")
+        sys.exit(1)
+    
     finally:
         ExperimentLogger.finish()
 
