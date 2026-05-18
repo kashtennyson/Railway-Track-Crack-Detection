@@ -11,10 +11,15 @@ venv/
 ._*
 
 # --- Project Specific ---
-output/               # Don't upload large model weights (.keras files)
-wandb/                # Local logs for Weights & Biases
-changes/              # Temporary project-related markdown files
-*.ipynb_checkpoints   # Jupyter temporary files
+
+# Don't upload large model weights (.keras files)
+output/
+# Local logs for Weights & Biases
+wandb/
+# Temporary project-related markdown files
+markdowns/
+# Jupyter temporary files
+*.ipynb_checkpoints
 
 # --- IDEs ---
 .vscode/
@@ -22,3 +27,5 @@ changes/              # Temporary project-related markdown files
 
 # --- Additional Files ---
 test.ipynb
+.cursorindexingignore
+commit_msg.txt
